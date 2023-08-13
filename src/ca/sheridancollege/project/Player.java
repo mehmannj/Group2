@@ -1,5 +1,5 @@
 /**
- * SYST 17796 Project Base code.
+ * SYST 17796 Project code.
  * Students can modify and extend to implement their game.
  * Add your name as an author and the date!
  */
@@ -8,42 +8,132 @@ package ca.sheridancollege.project;
 /**
  * A class that models each Player in the game. Players have an identifier, which should be unique.
  *
- * @author dancye
- * @author Paul Bonenfant Jan 2020
+ * @author Group2 : Mann Mehta, Maharsh Patel, Shlok Zala, Vaishnavi Barot
  */
-public abstract class Player {
+import java.util.ArrayList;
+import java.util.List;
 
-    private String name; //the unique name for this player
-
-    /**
-     * A constructor that allows you to set the player's unique ID
-     *
-     * @param name the unique ID to assign to this player.
-     */
+public class Player {
+    private String name;
+    private List<Card> hand;
+    private int score;  // Adding a score attribute
+    
     public Player(String name) {
         this.name = name;
+        hand = new ArrayList<>();
+        score = 0;  // Initializing score to 0
     }
-
-    /**
-     * @return the player name
-     */
+    
+    // Getter for player's name
     public String getName() {
         return name;
     }
-
-    /**
-     * Ensure that the playerID is unique
-     *
-     * @param name the player name to set
-     */
-    public void setName(String name) {
-        this.name = name;
+    
+    // Add a card to the player's hand
+    public void addCardToHand(Card card) {
+        hand.add(card);
     }
-
-    /**
-     * The method to be overridden when you subclass the Player class with your specific type of Player and filled in
-     * with logic to play your game.
-     */
-    public abstract void play();
-
+    
+    // Check if the player has a card of a specific rank
+    public boolean hasCardOfRank(String rank) {
+        for (Card card : hand) {
+            if (card.getRank().equals(rank)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Give all cards of a specific rank from the player's hand
+    public List<Card> giveCardsOfRank(String rank) {
+        List<Card> matchingCards = new ArrayList<>();
+        for (Card card : hand) {
+            if (card.getRank().equals(rank)) {
+                matchingCards.add(card);
+            }
+        }
+        hand.removeAll(matchingCards);
+        return matchingCards;
+    }
+    
+    // Get the player's current hand
+    public List<Card> getHand() {
+        return hand;
+    }
+    
+    // Display the player's hand
+    public void displayHand() {
+        System.out.println(name + "'s hand:");
+        for (Card card : hand) {
+            System.out.println(card);
+        }
+    }
+    
+    // Draw a card from a deck and add it to the player's hand
+    public void drawCardFromDeck(GroupOfCards groupOfCards) {
+        Card drawnCard = groupOfCards.drawCard();
+        if (drawnCard != null) {
+            addCardToHand(drawnCard);
+        } else {
+            System.out.println("The deck is empty.");
+        }
+    }
+    
+    // Check if the player's hand is empty
+    public boolean isHandEmpty() {
+        return hand.isEmpty();
+    }
+    
+    // Add cards to the player's hand when drawing from the deck
+    public void addCardsToHand(List<Card> cards) {
+        hand.addAll(cards);
+    }
+    
+    // Scoring related methods
+    // Increase the player's score
+    public void increaseScore(int points) {
+        score += points;
+    }
+    
+    // Get the player's current score
+    public int getScore() {
+        return score;
+    }
+    
+    // Calculate and return the number of sets the player has collected
+    public int calculateSets() {
+        int[] rankCounts = new int[Card.RANKS.length];
+        
+        for (Card card : hand) {
+            int rankIndex = getRankIndex(card.getRank()); // Use the helper method to get the rank index
+            rankCounts[rankIndex]++;
+        }
+        
+        int sets = 0;
+        for (int count : rankCounts) {
+            sets += count / 4;
+        }
+        
+        return sets;
+    }
+    
+    // Helper method to get the index of a rank in the Card.RANKS array
+    private int getRankIndex(String rank) {
+        for (int i = 0; i < Card.RANKS.length; i++) {
+            if (Card.RANKS[i].equals(rank)) {
+                return i;
+            }
+        }
+        return -1; // Rank not found
+    }
+    
+    // Display the player's score
+    public void displayScore() {
+        System.out.println(name + "'s score: " + score);
+    }
+    
+    @Override
+    public String toString() {
+        return name + "'s hand: " + hand + " (Score: " + score + ")";
+    }
 }
